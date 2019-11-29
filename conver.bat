@@ -1,2 +1,0 @@
-E:\caffe\caffe-master\Build\x64\Release\convert_imageset.exe --resize_height=512 --resize_width=512 --shuffle -backend="leveldb" E:\caffe\MRI\MRI_yihang\train  E:\caffe\MRI\MRI_yihang\train.txt  E:\caffe\MRI\MRI_yihang\traindb
-pause
