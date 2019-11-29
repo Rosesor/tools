@@ -1,0 +1,2 @@
+D:\caffe\caffe-master\Build\x64\Release\classification E:\yihang\caffe_sar\deploy.prototxt E:\yihang\caffe_sar\_iter_1845840.caffemodel E:/yihang/database-sar/sar10_rotate/lmdb_test/mean_test10.binaryproto E:\yihang\tools\label.txt E:\yihang\database-sar\sar10_rotate\test\2\2R338.jpg
+pause
