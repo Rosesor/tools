@@ -1,0 +1,72 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Nov  8 10:48:28 2019
+
+@author: 介
+"""
+
+# 修改json
+import re, os
+
+def aterpolygon(file, rate, outdir):
+    with open(file, "r") as f1,open("%s" % outdir, "w") as f2:
+        for line in f1:
+            if "points" in line:
+                f2.write(line)
+                line = next(f1)
+                f2.write(line)
+
+
+                line = next(f1)
+                x1 = float(line.split(',')[0])/rate
+                x1 = '          ' + str(x1) + ',\n'
+                f2.write(x1)
+                line = next(f1)
+                y1 = float(line)/rate
+                print("y1", y1)
+                y1 = '          ' + str(y1) + '\n'
+                f2.write(y1)
+
+                line = next(f1)
+                f2.write(line)
+                line = next(f1)
+                f2.write(line)
+                line = next(f1)
+                x2 = float(line.split(',')[0]) / rate
+                x2 = '          ' + str(x2) + '\n'
+                f2.write(x2)
+                line = next(f1)
+                y2 = float(line)/rate
+                y2 = '          ' + str(y2) + '\n'
+                f2.write(y2)
+
+                line = next(f1)
+                f2.write(line)
+                line = next(f1)
+                f2.write(line)
+                line = next(f1)
+                print(line)
+                x3 = float(line.split(',')[0]) / rate
+                x3 = '          ' + str(x3) + '\n'
+                f2.write(x3)
+                line = next(f1)
+                y3 = float(line) / rate
+                y3 = '          ' + str(y3) + '\n'
+                f2.write(y3)
+
+                line = next(f1)
+                f2.write(line)
+                line = next(f1)
+                f2.write(line)
+                line = next(f1)
+                print(line)
+                x4 = float(line.split(',')[0]) / rate
+                print("x4", x4)
+                x4 = '          ' + str(x4) + '\n'
+                f2.write(x4)
+                line = next(f1)
+                y4 = float(line) / rate
+                y4 = '          ' + str(y4) + '\n'
+                f2.write(y4)
+            else:
+                f2.write(line)
