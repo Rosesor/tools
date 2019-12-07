@@ -40,8 +40,8 @@ def file_name(file_dir):
         return L
 
 def resize_point(img, new_width, new_height, point):
-    x_rate = img.shape[1]/new_width
-    y_rate = img.shape[0]/new_height
+    x_rate = float(img.shape[1])/float(new_width)
+    y_rate = float(img.shape[0])/float(new_height)
 
     img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     img = img.resize((new_width,new_height),Image.BILINEAR)
@@ -50,8 +50,8 @@ def resize_point(img, new_width, new_height, point):
     point = np.reshape(point, newshape=(int(len(point) / 2), 2))
     # point旋转
     for i in range(0,len(point)):
-        point[i][0]=point[i][0]/x_rate
-        point[i][1]=point[i][1]/y_rate
+        point[i][0]=float(point[i][0])/x_rate
+        point[i][1]=float(point[i][1])/y_rate
     # point变回一列
     point = np.reshape(point, newshape=(int(len(point) / 4), 8))
     return img, point
