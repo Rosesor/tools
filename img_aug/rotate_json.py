@@ -7,13 +7,13 @@ import random
 import re
 import cv2
 import numpy as np
-from random import choice
 import math
-from PIL import Image
+import time
 
-source_path = 'F:/cocoDataAugment/data'
-destination_source_path = 'F:/cocoDataAugment/rotate/random'
-angle = [10,20,30,40,50,60,70,80,90]
+source_path = '/home/tyy/Desktop/img_aug/small_img'
+destination_source_path = '/home/tyy/Desktop/img_aug/rotate'
+destination_path = destination_source_path #+'/'+str(angle[a])
+angle = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180]
 
 article_info = {}
 data_json = json.loads(json.dumps(article_info,indent=4))
@@ -55,35 +55,33 @@ def rotation_point(img, angle, point):
     b = M[:, 2:]
     b = np.reshape(b, newshape=(1, 2))
     a = np.transpose(a)
-    # 将point变成两列（x，y)
     point = np.reshape(point, newshape=(int(len(point) / 2), 2))
-    # point旋转
     point = np.dot(point, a) + b
-    # point变回一列
-    point = np.reshape(point, newshape=(int(len(point) / 4), 8))
-
-    x_rate = img.shape[1]/1280
-    y_rate = img.shape[0]/1024
+    x_rate = float(img.shape[1])/float(1280)
+    if x_rate<1:
+        print(img.shape[1],"_xx")
+    y_rate = float(img.shape[0])/float(1024)
+    if y_rate<1:
+        print(img.shape[0],"_yy")
     widthNew=1280
     heightNew=1024
-
-    img = img.resize((1280,1024),Image.BILINEAR)
-    point = np.reshape(point, newshape=(int(len(point) / 2), 2))
-    # point旋转
-    for i in range(0,len(point)):
-        point[i][0]=point[i][0]/x_rate
-        point[i][1]=point[i][1]/y_rate
-    # point变回一列
+    for i in range(0,4):
+        point[i][0]=float(point[i][0])/x_rate
+        point[i][1]=float(point[i][1])/y_rate
     point = np.reshape(point, newshape=(int(len(point) / 4), 8))
+    img = cv2.resize(img, (1280,1024), interpolation=cv2.INTER_NEAREST)
     return img, point, heightNew, widthNew
 
 # for a in range(len(angle)):
-destination_path = destination_source_path #+'/'+str(angle[a])
+
 if not os.path.isdir(destination_path):
     os.mkdir(destination_path)
 print(destination_path)
 for angle_index in range(len(angle)):
+    print(angle_index)
+    t_3 = time.time()
     for name in enumerate(file_name(source_path)):
+        print(name)
         shape_json = []
         m_path = name[1]
         dir = os.path.dirname(m_path)
@@ -107,10 +105,16 @@ for angle_index in range(len(angle)):
             img = cv2.imread(data_path)
             im_rotate, point, data_json['imageHeight'], data_json['imageWidth'] = rotation_point(img, angle_item, point)
             (filename, extension) = os.path.splitext(data_name)
-            data_new_picture_name = destination_path + "/" + str(angle_item) + "/"+filename + "_" + str(angle_item) + ".jpg"
-            data_new_json_name = destination_path + "/" + str(angle_item) + "/" + filename + "_" + str(angle_item) + ".json"
-            if not os.path.exists(str(destination_path + "/" + str(angle_item) + "/")):
-                os.mkdir(str(destination_path + "/" + str(angle_item) + "/"))
+            # data_new_picture_name = destination_path + "/" + str(angle_item) + "/"+filename + "_" + str(angle_item) + ".jpg"
+            # data_new_json_name = destination_path + "/" + str(angle_item) + "/" + filename + "_" + str(angle_item) + ".json"
+            # if not os.path.exists(str(destination_path + "/" + str(angle_item) + "/")):
+            #     os.mkdir(str(destination_path + "/" + str(angle_item) + "/"))
+            #     print('create ',str(destination_path + "/" + str(angle_item) + "/"))
+            data_new_picture_name = destination_path + "/" + filename + "_" + str(angle_item) + ".jpg"
+            data_new_json_name = destination_path + "/"  + filename + "_" + str(angle_item) + ".json"
+            # if os.path.exists(str(data_new_json_name.split('.')[0])) is False:
+            #     os.mkdir(str(destination_path))
+            #     print('create ',str(destination_path))
             data_json['imagePath'] = filename + "_" + str(angle_item) + ".jpg"
             cv2.imwrite(data_new_picture_name, im_rotate)
             # im_rotate = cv2.imread(data_new_picture_name)
@@ -130,3 +134,5 @@ for angle_index in range(len(angle)):
         fp = open(data_new_json_name, "w+")
         fp.write(data_info)
         fp.close()
+    t_4 = time.time()
+    print('t_cost: ', t_4 - t_3, 'sec')
