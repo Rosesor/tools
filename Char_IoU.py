@@ -6,12 +6,10 @@ import os
 import io
 import json
 import re
-
 import cal_IoU as cI
 
-label_txt_path = '/home/jie/Desktop/product_date/masktext/lib/datasets/data/moudle_8_test/test_gts/'
-
-
+label_txt_path = 'D:\MyApplication\github/tools/'
+chars_path = 'D:\MyApplication\github/tools/'
 def cal_box_acc(test_box):
     true = 0
     label_len = 0
@@ -19,13 +17,17 @@ def cal_box_acc(test_box):
     miss = 0
     for i in range(len(test_box)):
         label = get_one_box(label_txt_path,test_box[i]['image_name'])
+        print(label)
+        print(test_box)
         label_len = label_len + len(label['box_list'])
         if len(label['box_list'])>=len(test_box[i]['box_list']):
             for j in range(len(label['box_list'])):
                 flag = 0
+                #print(label['box_list'][j])
                 for k in range(len(test_box[i]['box_list'])):
+                    #print(test_box[i]['box_list'][k])
                     value = cI.cal_IoU(label['box_list'][j], test_box[i]['box_list'][k])
-                    if value > 0:
+                    if value > 0.8:
                         true = true + 1
                         flag = 1
                         break
@@ -37,7 +39,7 @@ def cal_box_acc(test_box):
                 flag = 0
                 for k in range(len(test_box[i]['box_list'])):
                     value = cI.cal_IoU(label['box_list'][j], test_box[i]['box_list'][k])
-                    if value > 0:
+                    if value > 0.8:
                         true = true + 1
                         flag = 1
                         break
@@ -68,11 +70,11 @@ def get_test_box(path):
         f = open(file)  # 打开文件
         iter_f = iter(f)  # 创建迭代器
         for line in iter_f:  # 遍历文件，一行行遍历，读取文本
-            box_coordinate = re.findall(r'［(.*)］;',line)
-            box_coordinate = box_coordinate[0]
-            box_coordinate = box_coordinate.split(',')
-            box_coordinate = [int(x) for x in box_coordinate]
-            t['box_list'].append(box_coordinate)
+            box_coordinate = re.findall(r'\[(.*)\]',line)
+            for o in box_coordinate:
+                one_coordinate = o.split(',')
+                one_coordinate = [float(x) for x in one_coordinate]
+                t['box_list'].append(one_coordinate)
         test_box.append(t)
     return test_box
 
@@ -83,16 +85,24 @@ def get_one_box(label_txt_path,name):
     iter_f = iter(f)  # 创建迭代器
     label['box_list'] = []
     for line in iter_f:  # 遍历文件，一行行遍历，读取文本
-        box_coordinate = re.findall(r',\d,',line)
-        if len(box_coordinate) < 1:
-            print(name)
-        box_coordinate = box_coordinate[0]
-        box_coordinate = box_coordinate.split(',')
-        box_coordinate = map(float, box_coordinate)
-        label['box_list'].append(box_coordinate)
+        box_coordinate = line.split(',')
+        one_coordinate = []
+        count = 0
+        for o in range(len(box_coordinate)):
+            if o+count>=len(box_coordinate):
+                break
+            if re.search(r'o\d+o',box_coordinate[o+8]):
+                # print(box_coordinate[o+8])
+                count = count+9
+            if (o+1) % 9 == 0 and o != 0:
+                # print(box_coordinate[o])
+                label['box_list'].append(one_coordinate)
+                one_coordinate = []
+            else:
+                one_coordinate.append(float(box_coordinate[o+count]))
     return label
 
-t_box = get_test_box('/home/jie/Desktop/product_date/masktext/results/train/rotate_train/moudle_8_test/model_final.pkl_results/result_final/')
+t_box = get_test_box(chars_path)
 # t_box = get_test_box('/home/jie/Desktop/product_date/masktext/results/train/rotate_train/moudle_8_test/model_final.pkl_results/test/')
 
 print(cal_box_acc(t_box))
